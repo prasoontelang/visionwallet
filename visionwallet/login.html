@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <style>
+  h2 { color:#FFFFFF; }
+  center { margin-top:125px; }
+  </style>
+  <script>
+    document.getElementById("usernm").value = "";
+    document.getElementById("passwd").value = "";
+    function performlogin()
+    {
+        document.getElementById("userblank").innerHTML = "";
+        document.getElementById("passblank").innerHTML = "";
+        var username = document.getElementById("usernm");
+        var password = document.getElementById("passwd");
+        /*
+         * Checking for incomplete fields
+         */
+        if (username.value == "")
+        {
+            var incompleteField = "Incomplete Field";
+            var tag = document.getElementById("userblank");
+            tag.innerHTML = incompleteField;
+
+            return;
+        }
+        else if (password.value == "")
+        {
+            var incompleteField = "Incomplete Field";
+            var tag = document.getElementById("passblank");
+            tag.focus();
+            tag.innerHTML = incompleteField;
+
+            return;
+        }
+        /*
+         * Performing AJAX check
+         */
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange=function()
+        {
+          if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+          {
+            res = xmlhttp.responseText;
+            if (res == "customer")
+            {
+                window.location.href = "payment.php";
+            }
+            else if (res == "merchant")
+            {
+                window.location.href = "merchant.php";
+            }
+            else if (res == "fail")
+            {
+                alert("Invalid username/password");
+                password.value="";
+            }
+          }
+        }
+        xmlhttp.open("POST", "login.php", true);
+        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        xmlhttp.send("usernm=" + username.value + "&passwd=" + password.value);
+    }
+  </script>
+</head>
+<body bgcolor="#339999">
+  <center>
+  <h2>VISIONWALLET</h2>
+  <table border="0">
+  <tr>
+   <!--td><span style="color:white">Username: </span></td-->
+   <td><input type="text" style="font-size:25px" id="usernm" name="usernm" placeholder="Username">&nbsp;<span id="userblank"></span></td>
+  </tr>
+  <tr>
+    <!--td><span style="color:white">Password: </span></td-->
+    <td><input type="password" style="font-size:25px" id="passwd" name="passwd" placeholder="Password">&nbsp;<span id="passblank"></span></td>
+  </tr>
+  <tr>
+    <!--td></td-->
+    <td><span style="float:right"><button type="button" onclick="performlogin()">Login</button><button onclick="location.href='register.html'">Register</button></span></td>
+  </tr>
+  </table>
+  </center>
+</body>
+</html>
