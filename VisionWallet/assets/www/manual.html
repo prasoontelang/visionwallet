@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <style>
+   h2 { color:white; }
+  </style>
+  <script>
+              function sendData()
+            {
+                var merchID = document.getElementById("merchID");
+                var amount = document.getElementById("amount");
+
+                var result = merchID.value + "#" + amount.value;
+                processData(result);
+            }
+            function processData(transaction)
+            {
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.onreadystatechange=function()
+                {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+                    {
+                        res = xmlhttp.responseText;
+                        if (res == "false")
+                        {
+                          alert("Invalid merchant code");
+                        }
+                        else
+                        {
+	                          var r = confirm (res);
+	                          if (r==true)
+	                          {
+	                            tccgenerate();
+	                          }
+	                          else
+	                          {
+	                            return;
+	                          }
+                        }
+                    }
+                }
+                xmlhttp.open("POST", "http://192.168.11.64/vw/paycheck.php", true);
+                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xmlhttp.send("trans=" + transaction);
+            }
+            function tccgenerate()
+            {
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.onreadystatechange=function()
+                {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+                    {
+                        res = xmlhttp.responseText;
+                        alert(res);
+                    }
+                }
+                xmlhttp.open("POST", "http://192.168.11.64/vw/generateTCC.php", true);
+                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xmlhttp.send();
+            }            
+  </script>
+ </head>
+ <body bgcolor="#339999">
+  <center><h2>Enter Manually</h2>
+  <table border="0">
+  <tr>
+      <td><span style="color:white;">Merchant ID</span></td><td><input type="text" name="merchID" id="merchID"/></td>
+  </tr>
+  <tr>
+      <td><span style="color:white;">Amount</span></td><td><input type="text" name="amount" id="amount"/></td>
+  </tr>
+  <tr>
+       <td colspan="2"><input type="button" onclick="sendData()" value="Submit" style="float:right;"/></td>
+  </tr>
+  </table>
+  <br/><br/><br/>
+  <button type="button" onclick="location.href='scannerpage.html'">Go back</button></center>
+ </body>
+ </html>

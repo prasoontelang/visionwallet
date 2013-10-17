@@ -1,0 +1,29 @@
+<html>
+<head>
+  <style>
+    h2 { color:white;}
+    td { color:white;}
+    th { color:white;}
+  </style>
+</head>
+<body bgcolor="#339999">
+  <center>
+  <h2>Active TCCs</h2>
+  <span id = "disp"></span>
+  <script>
+      var xmlactive = new XMLHttpRequest();
+	  xmlactive.onreadystatechange=function()
+	  {
+	     if (xmlactive.readyState == 4 && xmlactive.status == 200)
+	     {
+	        document.getElementById("disp").innerHTML = xmlactive.responseText;
+	     }
+	  }
+	  xmlactive.open("GET", "http://192.168.11.64/vw/activetcc.php", true);
+	  xmlactive.send();
+  </script>
+  <br/><br/><br/>
+  <button type="button" onclick="location.href='scannerpage.html'">Go back</button>
+  </center>
+</body>
+</html>

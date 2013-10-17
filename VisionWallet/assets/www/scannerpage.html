@@ -1,0 +1,146 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+    <link rel="stylesheet" type="text/css" href="button.css">
+        <style>
+            h2 { color:white; }
+        </style>
+        <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+        <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width">
+        <title>My Barcode/QR Code Scanner</title>
+        <script type="text/javascript" src="cordova-2.7.0.js"></script>
+        <script type="text/javascript" src="barcodescanner.js"></script>
+        <script type="text/javascript">
+            function scanCode()
+            {
+                window.plugins.barcodeScanner.scan(
+                    function(result)
+                    {
+                        processData(result.text);
+                    },
+                    function(error){
+                        alert("Scan failed: " + error);
+                    }
+                );
+            }
+            function processData(transaction)
+            {
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.onreadystatechange=function()
+                {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+                    {
+                        res = xmlhttp.responseText;
+                        if (res == "false")
+                        {
+                          alert("Invalid merchant code");
+                        }
+                        else
+                        {
+	                          var r = confirm (res);
+	                          if (r==true)
+	                          {
+	                            tccgenerate();
+	                          }
+	                          else
+	                          {
+	                            return;
+	                          }
+                        }
+                    }
+                }
+                xmlhttp.open("POST", "http://192.168.11.64/vw/paycheck.php", true);
+                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xmlhttp.send("trans=" + transaction);
+            }
+            
+            function tccgenerate()
+            {
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.onreadystatechange=function()
+                {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+                    {
+                        res = xmlhttp.responseText;
+                        alert(res);
+                    }
+                }
+                xmlhttp.open("POST", "http://192.168.11.64/vw/generateTCC.php", true);
+                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xmlhttp.send();
+            }
+	        function onConfirmQuit(button)
+	        {
+	            if(button == "1")
+	            {
+	                navigator.app.exitApp();
+	            }
+	        }
+	        function signoff()
+	        {
+	            logout();
+	            window.location.href="index.html";
+	        }
+	        function logout()
+	        {
+	        	var xmlhttp = new XMLHttpRequest();
+	            xmlhttp.onreadystatechange=function()
+	            {
+	                if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+	                {
+                        alert("You have been logged out");	                      
+	                }
+	            }
+	            xmlhttp.open("GET", "http://192.168.11.64/vw/logout.php", true);
+	            xmlhttp.send();
+	        }
+	        function checkbalance()
+	        {
+  	            var xmlbal = new XMLHttpRequest();
+	            xmlbal.onreadystatechange=function()
+	            {
+	                if (xmlbal.readyState == 4 && xmlbal.status == 200)
+	                {
+                        alert("Available balance: Rs. " + xmlbal.responseText);  	                      
+	                }
+	            }
+	            xmlbal.open("GET", "http://192.168.11.64/vw/balenquiry.php", true);
+	            xmlbal.send();
+	        }
+        </script>
+    </head>
+ 
+    <body bgcolor="#339999">
+        <center><h2>Welcome <span id="username"></span></h2><br/><br/><br/><br/>
+        <button type="button" class="button" onclick="scanCode();">Scan a QR Code</button><br/><br/>
+        <button type="button" class="button" onclick="location.href='manual.html'">Enter manually</button><br/><br/>
+        <button type="button" class="button" onclick="checkbalance()">Check balance</button><br/><br/>
+        <button type="button" class="button" onclick="location.href='activetcc.html'">Active TCCs</button><br/><br/>
+        <button type="button" class="button" onclick="signoff()">Sign out</button><br/><br/>
+        </center>
+        <script>
+        <!-- Retrieving username -->
+        var xmlh = new XMLHttpRequest();
+        xmlh.onreadystatechange=function()
+        {
+            if (xmlh.readyState == 4 && xmlh.status == 200)
+            {
+                user = xmlh.responseText;
+                username = user.split(" ");
+                document.getElementById("username").innerHTML = username[0];
+            }
+        }
+        xmlh.open("GET", "http://192.168.11.64/vw/username.php", true);
+        xmlh.send();
+        <!-- Adding exit event -->
+        document.addEventListener("backbutton", function () { 
+                navigator.notification.confirm(
+                         'Do you want to quit', 
+                         onConfirmQuit, 
+                         'Visionwallet', 
+                         'OK,Cancel'  
+                     );
+                }, true); 
+        </script>
+    </body>
+</html>
